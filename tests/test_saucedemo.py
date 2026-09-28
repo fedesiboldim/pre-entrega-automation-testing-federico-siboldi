@@ -17,18 +17,25 @@ def test_login_exitoso(driver):
     assert titulo.text.lower() == "products"
 
 def test_catalogo_productos(driver):
-    """Caso 2: Verifica que el catálogo muestre productos y elementos clave de interfaz."""
+    """Caso 2: Verifica catalogo, elementos de interfaz y lista nombres/precios."""
     login_saucedemo(driver)
     
-    # Validar título visible
+    # 1. Validar título visible
     titulo = esperar_elemento(driver, By.CSS_SELECTOR, "span.title")
     assert titulo.is_displayed()
     
-    # Comprobar existencia de al menos un producto visible
+    # 2. Comprobar existencia y listar nombres y precios
     productos = driver.find_elements(By.CLASS_NAME, "inventory_item")
     assert len(productos) > 0, "No se encontraron productos en el inventario."
     
-    # Validar menú y selector de filtros
+    for item in productos:
+        nombre = item.find_element(By.CLASS_NAME, "inventory_item_name").text
+        precio = item.find_element(By.CLASS_NAME, "inventory_item_price").text
+        assert nombre != "", "El producto no tiene nombre"
+        assert "$" in precio, "El precio no tiene formato valido"
+        print(f"Producto: {nombre} | Precio: {precio}")
+
+    # 3. Validar menú y selector de filtros
     menu_btn = driver.find_element(By.ID, "react-burger-menu-btn")
     filtro = driver.find_element(By.CLASS_NAME, "product_sort_container")
     assert menu_btn.is_displayed()
